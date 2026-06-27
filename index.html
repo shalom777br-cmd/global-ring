@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>GlobalRing</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+–bg: #0d0f14;
+–surface: #151820;
+–surface2: #1c2030;
+–border: #252a3a;
+–accent: #3b5bff;
+–accent2: #00e5a0;
+–text: #e8eaf2;
+–muted: #6b7394;
+–danger: #ff4f6a;
+–gold: #f5c842;
+}
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘Space Grotesk’, ‘Noto Sans JP’, sans-serif;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+max-width: 430px;
+margin: 0 auto;
+position: relative;
+overflow-x: hidden;
+}
+
+/* ── Header ── */
+.header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 20px 20px 12px;
+}
+.logo {
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 18px;
+font-weight: 700;
+letter-spacing: -0.5px;
+}
+.logo-icon {
+width: 32px; height: 32px;
+background: var(–accent);
+border-radius: 9px;
+display: flex; align-items: center; justify-content: center;
+font-size: 16px;
+}
+.avatar {
+width: 34px; height: 34px;
+border-radius: 50%;
+background: linear-gradient(135deg, var(–accent), var(–accent2));
+display: flex; align-items: center; justify-content: center;
+font-size: 13px; font-weight: 700; color: #fff;
+cursor: pointer;
+}
+
+/* ── Balance Card ── */
+.balance-card {
+margin: 8px 16px 16px;
+background: linear-gradient(135deg, #1a1f35 0%, #0f1420 100%);
+border: 1px solid var(–border);
+border-radius: 20px;
+padding: 20px;
+position: relative;
+overflow: hidden;
+}
+.balance-card::before {
+content: ‘’;
+position: absolute;
+top: -40px; right: -40px;
+width: 120px; height: 120px;
+background: var(–accent);
+opacity: 0.08;
+border-radius: 50%;
+}
+.balance-label {
+font-size: 10px;
+letter-spacing: 1.5px;
+text-transform: uppercase;
+color: var(–muted);
+margin-bottom: 6px;
+font-family: ‘Space Mono’, monospace;
+}
+.balance-amount {
+font-size: 36px;
+font-weight: 700;
+letter-spacing: -1.5px;
+color: var(–text);
+line-height: 1;
+margin-bottom: 16px;
+}
+.balance-amount span {
+font-size: 18px;
+font-weight: 400;
+color: var(–muted);
+margin-right: 2px;
+}
+.balance-actions {
+display: flex;
+gap: 8px;
+}
+.btn-charge {
+background: var(–accent);
+color: #fff;
+border: none;
+border-radius: 12px;
+padding: 10px 20px;
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+font-family: ‘Space Grotesk’, sans-serif;
+display: flex; align-items: center; gap: 6px;
+transition: all 0.2s;
+}
+.btn-charge:active { transform: scale(0.96); background: #2a47f0; }
+
+/* ── Quick Actions ── */
+.quick-actions {
+display: flex;
+gap: 8px;
+padding: 0 16px 20px;
+}
+.qa-btn {
+flex: 1;
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 14px;
+padding: 14px 8px;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 6px;
+cursor: pointer;
+transition: all 0.2s;
+}
+.qa-btn:active { transform: scale(0.95); background: var(–surface2); }
+.qa-btn.active {
+background: var(–accent);
+border-color: var(–accent);
+}
+.qa-icon { font-size: 20px; line-height: 1; }
+.qa-label {
+font-size: 10px;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+letter-spacing: 0.5px;
+}
+.qa-btn.active .qa-label { color: rgba(255,255,255,0.8); }
+
+/* ── Dialer Section ── */
+.section {
+margin: 0 16px;
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 20px;
+overflow: hidden;
+margin-bottom: 16px;
+}
+.section-header {
+padding: 16px 18px 12px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+border-bottom: 1px solid var(–border);
+}
+.section-title {
+font-size: 10px;
+letter-spacing: 1.8px;
+text-transform: uppercase;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+}
+
+/* ── Country Selector ── */
+.country-field {
+padding: 14px 18px;
+border-bottom: 1px solid var(–border);
+}
+.field-label {
+font-size: 10px;
+letter-spacing: 1.2px;
+text-transform: uppercase;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+margin-bottom: 8px;
+}
+.country-select {
+width: 100%;
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 12px 14px;
+color: var(–text);
+font-size: 14px;
+font-family: ‘Space Grotesk’, ‘Noto Sans JP’, sans-serif;
+font-weight: 500;
+cursor: pointer;
+appearance: none;
+background-image: url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘12’ height=‘8’ viewBox=‘0 0 12 8’%3E%3Cpath d=‘M1 1l5 5 5-5’ stroke=’%236b7394’ stroke-width=‘1.5’ fill=‘none’ stroke-linecap=‘round’/%3E%3C/svg%3E”);
+background-repeat: no-repeat;
+background-position: right 14px center;
+}
+.country-select:focus { outline: none; border-color: var(–accent); }
+
+/* ── Number Display ── */
+.number-display {
+background: #080c16;
+margin: 14px 18px;
+border-radius: 14px;
+padding: 18px;
+border: 1px solid #1a2040;
+position: relative;
+overflow: hidden;
+}
+.number-display::after {
+content: ‘’;
+position: absolute;
+bottom: 0; left: 0; right: 0;
+height: 1px;
+background: linear-gradient(90deg, transparent, var(–accent2), transparent);
+opacity: 0.4;
+}
+.nd-meta {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 10px;
+}
+.nd-tag {
+font-family: ‘Space Mono’, monospace;
+font-size: 9px;
+letter-spacing: 1.5px;
+color: var(–accent2);
+text-transform: uppercase;
+}
+.nd-balance {
+font-family: ‘Space Mono’, monospace;
+font-size: 11px;
+color: var(–gold);
+}
+.nd-number {
+font-family: ‘Space Mono’, monospace;
+font-size: 32px;
+font-weight: 700;
+color: var(–accent2);
+letter-spacing: 2px;
+line-height: 1.1;
+min-height: 40px;
+word-break: break-all;
+}
+.nd-prefix {
+color: var(–muted);
+font-size: 18px;
+}
+.nd-cursor {
+display: inline-block;
+width: 2px;
+height: 28px;
+background: var(–accent2);
+vertical-align: middle;
+margin-left: 2px;
+animation: blink 1s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.nd-rate {
+font-family: ‘Space Mono’, monospace;
+font-size: 10px;
+color: var(–muted);
+margin-top: 8px;
+}
+.nd-rate b { color: var(–text); }
+
+/* ── Keypad ── */
+.keypad {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 1px;
+background: var(–border);
+border-top: 1px solid var(–border);
+}
+.key {
+background: var(–surface);
+padding: 18px 8px;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+transition: background 0.1s;
+gap: 2px;
+-webkit-tap-highlight-color: transparent;
+}
+.key:active { background: var(–surface2); }
+.key-num {
+font-size: 22px;
+font-weight: 600;
+font-family: ‘Space Grotesk’, sans-serif;
+line-height: 1;
+}
+.key-alpha {
+font-size: 9px;
+letter-spacing: 1.5px;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+min-height: 12px;
+}
+.key.special .key-num { font-size: 20px; color: var(–muted); }
+
+/* ── Bottom Actions ── */
+.bottom-actions {
+display: grid;
+grid-template-columns: 1fr 1.5fr 1fr;
+gap: 12px;
+padding: 16px 18px 20px;
+background: var(–surface);
+border-top: 1px solid var(–border);
+}
+.btn-action {
+background: transparent;
+border: none;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 12px;
+border-radius: 50%;
+font-size: 22px;
+transition: background 0.15s;
+-webkit-tap-highlight-color: transparent;
+}
+.btn-action:active { background: var(–surface2); }
+.btn-call {
+background: #1a6e3a;
+border-radius: 50%;
+width: 64px; height: 64px;
+margin: 0 auto;
+display: flex; align-items: center; justify-content: center;
+font-size: 26px;
+cursor: pointer;
+border: none;
+box-shadow: 0 0 24px rgba(0,200,80,0.25);
+transition: all 0.2s;
+-webkit-tap-highlight-color: transparent;
+}
+.btn-call:active { transform: scale(0.93); background: #145c30; }
+.btn-call.calling {
+background: var(–danger);
+box-shadow: 0 0 24px rgba(255,79,106,0.4);
+animation: pulse-ring 1.2s infinite;
+}
+@keyframes pulse-ring {
+0% { box-shadow: 0 0 0 0 rgba(255,79,106,0.4); }
+70% { box-shadow: 0 0 0 16px rgba(255,79,106,0); }
+100% { box-shadow: 0 0 0 0 rgba(255,79,106,0); }
+}
+
+/* ── Recent Calls Tab ── */
+.recents {
+padding: 0;
+}
+.recent-item {
+display: flex;
+align-items: center;
+padding: 14px 18px;
+border-bottom: 1px solid var(–border);
+gap: 14px;
+cursor: pointer;
+transition: background 0.15s;
+}
+.recent-item:last-child { border-bottom: none; }
+.recent-item:active { background: var(–surface2); }
+.ri-flag { font-size: 22px; flex-shrink: 0; }
+.ri-info { flex: 1; }
+.ri-number {
+font-family: ‘Space Mono’, monospace;
+font-size: 14px;
+font-weight: 700;
+color: var(–text);
+}
+.ri-meta { font-size: 11px; color: var(–muted); margin-top: 2px; }
+.ri-cost {
+font-family: ‘Space Mono’, monospace;
+font-size: 12px;
+color: var(–gold);
+text-align: right;
+}
+.ri-status { font-size: 11px; color: var(–muted); }
+
+/* ── Tab Nav ── */
+.tab-nav {
+display: flex;
+padding: 0 16px;
+gap: 4px;
+margin-bottom: 16px;
+}
+.tab-btn {
+flex: 1;
+padding: 8px;
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 10px;
+color: var(–muted);
+font-size: 12px;
+font-family: ‘Space Grotesk’, sans-serif;
+font-weight: 500;
+cursor: pointer;
+transition: all 0.2s;
+-webkit-tap-highlight-color: transparent;
+}
+.tab-btn.active {
+background: var(–accent);
+border-color: var(–accent);
+color: #fff;
+}
+
+/* ── Rates Tab ── */
+.rates-list { padding: 0; }
+.rate-item {
+display: flex;
+align-items: center;
+padding: 13px 18px;
+border-bottom: 1px solid var(–border);
+gap: 12px;
+}
+.rate-item:last-child { border-bottom: none; }
+.rate-flag { font-size: 22px; }
+.rate-country { flex: 1; font-size: 14px; font-weight: 500; }
+.rate-country small { display: block; font-size: 11px; color: var(–muted); font-family: ‘Space Mono’, monospace; }
+.rate-price {
+font-family: ‘Space Mono’, monospace;
+font-size: 13px;
+color: var(–accent2);
+font-weight: 700;
+}
+
+/* ── Toast ── */
+.toast {
+position: fixed;
+bottom: 100px;
+left: 50%;
+transform: translateX(-50%) translateY(20px);
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 10px 18px;
+font-size: 13px;
+color: var(–text);
+opacity: 0;
+transition: all 0.3s;
+pointer-events: none;
+white-space: nowrap;
+z-index: 100;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+
+</head>
+<body>
+
+<!-- Header -->
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">🌐</div>
+    GlobalRing
+  </div>
+  <div class="avatar">JO</div>
+</div>
+
+<!-- Balance Card -->
+
+<div class="balance-card">
+  <div class="balance-label">CREDIT BALANCE / 残高</div>
+  <div class="balance-amount"><span>¥</span><span id="balanceNum">2,300</span></div>
+  <div class="balance-actions">
+    <button class="btn-charge" onclick="showToast('チャージ機能は準備中です')">＋ チャージ</button>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+
+<div class="quick-actions">
+  <div class="qa-btn active" onclick="switchQA(this,'dial')">
+    <div class="qa-icon">📞</div>
+    <div class="qa-label">DIAL</div>
+  </div>
+  <div class="qa-btn" onclick="switchQA(this,'recent')">
+    <div class="qa-icon">🕐</div>
+    <div class="qa-label">RECENT</div>
+  </div>
+  <div class="qa-btn" onclick="switchQA(this,'rates')">
+    <div class="qa-icon">🧮</div>
+    <div class="qa-label">RATES</div>
+  </div>
+  <div class="qa-btn" onclick="switchQA(this,'settings')">
+    <div class="qa-icon">⚙️</div>
+    <div class="qa-label">CONFIG</div>
+  </div>
+</div>
+
+<!-- DIAL TAB -->
+
+<div id="tab-dial">
+  <!-- Tab buttons -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchDialTab(this,'dialer')">ダイヤラー</button>
+    <button class="tab-btn" onclick="switchDialTab(this,'speed')">スピードダイヤル</button>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">INTERNATIONAL DIALER / ダイヤラー</span>
+      <span>🔊</span>
+    </div>
+
+```
+<!-- Country Select -->
+<div class="country-field">
+  <div class="field-label">DESTINATION COUNTRY / 発信先</div>
+  <select class="country-select" id="countrySelect" onchange="updateRate()">
+    <option value="jp" data-rate="15" data-code="+81">🇯🇵 Japan（日本）(+81) — ¥15/分</option>
+    <option value="br" data-rate="12" data-code="+55">🇧🇷 Brazil（ブラジル）(+55) — ¥12/分</option>
+    <option value="us" data-rate="8" data-code="+1">🇺🇸 USA（米国）(+1) — ¥8/分</option>
+    <option value="cn" data-rate="10" data-code="+86">🇨🇳 China（中国）(+86) — ¥10/分</option>
+    <option value="kr" data-rate="12" data-code="+82">🇰🇷 Korea（韓国）(+82) — ¥12/分</option>
+    <option value="ph" data-rate="18" data-code="+63">🇵🇭 Philippines(+63) — ¥18/分</option>
+    <option value="in" data-rate="9" data-code="+91">🇮🇳 India（インド）(+91) — ¥9/分</option>
+    <option value="gb" data-rate="10" data-code="+44">🇬🇧 UK（英国）(+44) — ¥10/分</option>
+  </select>
+</div>
+
+<!-- Number Display -->
+<div class="number-display">
+  <div class="nd-meta">
+    <span class="nd-tag">SECURE DIGITAL TELEPHONY</span>
+    <span class="nd-balance">JPY ¥<span id="ndBalance">2,300</span></span>
+  </div>
+  <div class="nd-number">
+    <span class="nd-prefix" id="codePrefix">+81</span>
+    <span id="displayNumber"></span><span class="nd-cursor" id="cursor"></span>
+  </div>
+  <div class="nd-rate" id="rateInfo">レート: <b>¥15</b>/分 · Local Digital Network（市内デジタル網）</div>
+</div>
+
+<!-- Keypad -->
+<div class="keypad">
+  <div class="key" onclick="pressKey('1')"><div class="key-num">1</div><div class="key-alpha"></div></div>
+  <div class="key" onclick="pressKey('2')"><div class="key-num">2</div><div class="key-alpha">ABC</div></div>
+  <div class="key" onclick="pressKey('3')"><div class="key-num">3</div><div class="key-alpha">DEF</div></div>
+  <div class="key" onclick="pressKey('4')"><div class="key-num">4</div><div class="key-alpha">GHI</div></div>
+  <div class="key" onclick="pressKey('5')"><div class="key-num">5</div><div class="key-alpha">JKL</div></div>
+  <div class="key" onclick="pressKey('6')"><div class="key-num">6</div><div class="key-alpha">MNO</div></div>
+  <div class="key" onclick="pressKey('7')"><div class="key-num">7</div><div class="key-alpha">PQRS</div></div>
+  <div class="key" onclick="pressKey('8')"><div class="key-num">8</div><div class="key-alpha">TUV</div></div>
+  <div class="key" onclick="pressKey('9')"><div class="key-num">9</div><div class="key-alpha">WXYZ</div></div>
+  <div class="key special" onclick="pressKey('*')"><div class="key-num">＊</div><div class="key-alpha"></div></div>
+  <div class="key" onclick="pressKey('0')"><div class="key-num">0</div><div class="key-alpha">＋</div></div>
+  <div class="key special" onclick="pressKey('#')"><div class="key-num">#</div><div class="key-alpha"></div></div>
+</div>
+
+<!-- Bottom Actions -->
+<div class="bottom-actions">
+  <button class="btn-action" onclick="showToast('Twilioと接続後に利用可能になります')">📋</button>
+  <button class="btn-call" id="callBtn" onclick="toggleCall()">📞</button>
+  <button class="btn-action" onclick="deleteKey()">⌫</button>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- RECENT TAB -->
+
+<div id="tab-recent" style="display:none;">
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">RECENT CALLS / 通話履歴</span>
+    </div>
+    <div class="recents">
+      <div class="recent-item" onclick="dialRecent('+81 77728937')">
+        <div class="ri-flag">🇯🇵</div>
+        <div class="ri-info">
+          <div class="ri-number">+81 777-289-37</div>
+          <div class="ri-meta">昨日 14:32 · 3分12秒</div>
+        </div>
+        <div style="text-align:right">
+          <div class="ri-cost">¥48</div>
+          <div class="ri-status">📞</div>
+        </div>
+      </div>
+      <div class="recent-item" onclick="dialRecent('+55 11 9876 5432')">
+        <div class="ri-flag">🇧🇷</div>
+        <div class="ri-info">
+          <div class="ri-number">+55 11 9876-5432</div>
+          <div class="ri-meta">3日前 09:15 · 8分40秒</div>
+        </div>
+        <div style="text-align:right">
+          <div class="ri-cost">¥104</div>
+          <div class="ri-status">📞</div>
+        </div>
+      </div>
+      <div class="recent-item">
+        <div class="ri-flag">🇺🇸</div>
+        <div class="ri-info">
+          <div class="ri-number">+1 212-555-0198</div>
+          <div class="ri-meta">5日前 22:00 · 不在着信</div>
+        </div>
+        <div style="text-align:right">
+          <div class="ri-cost" style="color:var(--danger)">不在</div>
+          <div class="ri-status">📵</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RATES TAB -->
+
+<div id="tab-rates" style="display:none;">
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">CALL RATES / 通話料金</span>
+    </div>
+    <div class="rates-list">
+      <div class="rate-item"><span class="rate-flag">🇯🇵</span><div class="rate-country">日本<small>+81 · Japan</small></div><span class="rate-price">¥15/分</span></div>
+      <div class="rate-item"><span class="rate-flag">🇧🇷</span><div class="rate-country">ブラジル<small>+55 · Brazil</small></div><span class="rate-price">¥12/分</span></div>
+      <div class="rate-item"><span class="rate-flag">🇺🇸</span><div class="rate-country">アメリカ<small>+1 · USA</small></div><span class="rate-price">¥8/分</span></div>
+      <div class="rate-item"><span class="rate-flag">🇨🇳</span><div class="rate-country">中国<small>+86 · China</small></div><span class="rate-price">¥10/分</span></div>
+      <div class="rate-item"><span class="rate-flag">🇰🇷</span><div class="rate-country">韓国<small>+82 · Korea</small></div><span class="rate-price">¥12/分</span></div>
+      <div class="rate-item"><span class="rate-flag">🇵🇭</span><div class="rate-country">フィリピン<small>+63 · Philippines</small></div><span class="rate-price">¥18/分</span></div>
+      <div class="rate-item"><span class="rate-flag">🇮🇳</span><div class="rate-country">インド<small>+91 · India</small></div><span class="rate-price">¥9/分</span></div>
+      <div class="rate-item"><span class="rate-flag">🇬🇧</span><div class="rate-country">イギリス<small>+44 · UK</small></div><span class="rate-price">¥10/分</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS TAB -->
+
+<div id="tab-settings" style="display:none;">
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">CONFIGURATION / 設定</span>
+    </div>
+    <div style="padding:20px 18px; color:var(--muted); font-size:13px; line-height:1.7;">
+      <p style="margin-bottom:12px;">⚙️ <b style="color:var(--text)">Twilio API設定</b></p>
+      <p>Account SID: <span style="color:var(--danger)">未設定</span></p>
+      <p>Auth Token: <span style="color:var(--danger)">未設定</span></p>
+      <p>Phone Number: <span style="color:var(--danger)">未設定</span></p>
+      <br>
+      <p style="color:var(--accent2); font-size:12px;">⚡ Twilioアカウント登録後に設定します</p>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+let number = '';
+let isCalling = false;
+let callTimer = null;
+let callSeconds = 0;
+
+function pressKey(k) {
+  if (number.length >= 15) return;
+  number += k;
+  updateDisplay();
+  // haptic on iOS
+  if (navigator.vibrate) navigator.vibrate(10);
+}
+
+function deleteKey() {
+  number = number.slice(0, -1);
+  updateDisplay();
+}
+
+function updateDisplay() {
+  const el = document.getElementById('displayNumber');
+  el.textContent = formatNumber(number);
+}
+
+function formatNumber(n) {
+  // Simple grouping for display
+  if (n.length <= 4) return n;
+  if (n.length <= 8) return n.slice(0,4) + ' ' + n.slice(4);
+  return n.slice(0,4) + ' ' + n.slice(4,8) + ' ' + n.slice(8);
+}
+
+function updateRate() {
+  const sel = document.getElementById('countrySelect');
+  const opt = sel.options[sel.selectedIndex];
+  const rate = opt.dataset.rate;
+  const code = opt.dataset.code;
+  document.getElementById('codePrefix').textContent = code;
+  document.getElementById('rateInfo').innerHTML = `レート: <b>¥${rate}</b>/分 · Local Digital Network（市内デジタル網）`;
+}
+
+function toggleCall() {
+  if (!isCalling) {
+    if (number.length < 6) { showToast('番号を入力してください'); return; }
+    startCall();
+  } else {
+    endCall();
+  }
+}
+
+function startCall() {
+  isCalling = true;
+  const btn = document.getElementById('callBtn');
+  btn.textContent = '📵';
+  btn.classList.add('calling');
+  showToast('Twilio接続後に通話が開始されます');
+  callSeconds = 0;
+  callTimer = setInterval(() => {
+    callSeconds++;
+    const m = Math.floor(callSeconds/60).toString().padStart(2,'0');
+    const s = (callSeconds%60).toString().padStart(2,'0');
+    btn.title = `${m}:${s}`;
+  }, 1000);
+}
+
+function endCall() {
+  isCalling = false;
+  clearInterval(callTimer);
+  const btn = document.getElementById('callBtn');
+  btn.textContent = '📞';
+  btn.classList.remove('calling');
+  showToast('通話終了');
+}
+
+function dialRecent(num) {
+  // Switch to dial tab and fill number
+  document.querySelector('.qa-btn.active')?.classList.remove('active');
+  document.querySelector('.qa-btn').classList.add('active');
+  showTab('dial');
+  number = num.replace(/[^0-9]/g,'');
+  updateDisplay();
+}
+
+let currentTab = 'dial';
+function switchQA(btn, tab) {
+  document.querySelectorAll('.qa-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  showTab(tab);
+}
+
+function showTab(tab) {
+  ['dial','recent','rates','settings'].forEach(t => {
+    const el = document.getElementById('tab-'+t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+  });
+  currentTab = tab;
+}
+
+function switchDialTab(btn, sub) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (sub === 'speed') showToast('スピードダイヤルは準備中です');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Init
+updateRate();
+</script>
+
+</body>
+</html>
