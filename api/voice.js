@@ -22,7 +22,6 @@ module.exports = (req, res) => {
     timeout: 30
   });
 
-  // 電話番号かどうか判定（+から始まる）
   if (to.startsWith('+') || to.match(/^[0-9]/)) {
     dial.number(to);
   } else {
