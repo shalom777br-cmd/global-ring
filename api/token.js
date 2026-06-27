@@ -3,7 +3,6 @@ const AccessToken = twilio.jwt.AccessToken;
 const VoiceGrant = AccessToken.VoiceGrant;
 
 module.exports = (req, res) => {
-  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -34,7 +33,6 @@ module.exports = (req, res) => {
     });
 
     token.addGrant(voiceGrant);
-
     res.json({ token: token.toJwt() });
   } catch (err) {
     console.error('Token error:', err);
